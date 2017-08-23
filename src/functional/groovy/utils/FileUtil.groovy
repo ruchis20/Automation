@@ -22,9 +22,8 @@ class FileUtil {
      */
     def getFile(String file){
         def ant = new AntBuilder()
-        ant.project
+        ant.project.buildListeners[0].messageOutputLevel = 0
         new File(file).delete()
-        println "============ Retrieving file: "+ file + "=============="
         ant.scp(
                 trust:"true",
                 file:"${username}@${server}:${file}",
@@ -32,5 +31,19 @@ class FileUtil {
                 password:"${password}",
                 verbose:false
         )
+    }
+
+    boolean checkFileExists(String file){
+        def ant = new AntBuilder()
+        ant.project.buildListeners[0].messageOutputLevel = 0
+        ant.sshexec(host: server,
+                trust: true,
+                username: username,
+                password: password,
+                command: 'ls -la ' + file,
+                outputproperty: 'result'
+        )
+        def files = ant.project.properties.'result'.toString()
+        return files.contains(file)
     }
 }

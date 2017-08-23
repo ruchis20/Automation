@@ -1,0 +1,36 @@
+1 Comparing query result values with values stored as part of precondition
+question: what should be result of the comparison? they match, don't match?
+2 Comparing query result values with values stored in some file
+3 Comparing query result values with other query result values (1 or more column values)
+4 Comparing specific column values with given value in config/excel file
+5 Comparing specific column values with values given in some text file
+6 Comparing specific column values with values in log files generated after execution of .sh file
+7 Verifying if a particular log file created after execution of .sh file
+8 Verifying a file moved from source to destination after execution of .sh file
+9 Verifying number of records in 2 tables
+10 Verifying number of records in table and log file
+
+1 Comparing db table before and after batch job
+q. this is row by row nd field by field? what should be the outcome: match, not match?
+2 Comparing db values with some values in text file
+q. what is the difference between this and 5,6? how many columns in text file, what format?
+3 Comparing query result values with other query result values (1 or more column values)
+4 Comparing specific column values with given value in config file
+5 Comparing specific column values with values given in some text file
+6 Comparing specific column values with values in log files generated after execution of .sh file
+q. How is this different from 5 & 6?
+
+1. check billing table and save the result
+2. insert data into table_2
+3. run batch job batch.sh on
+4. check job completed successfully by checking log file job.log
+5. compare columns x, y z from table a with z, y, x from table b
+6. compare column x from table a with value of column 2 from file text.file
+7. check file x.log was moved from path a to path b
+
+And by the way:
+9 Verifying number of records in 2 tables
+10 Verifying number of records in table and log file
+
+When you compare two tables or table and log, you compare both number of records
+and fields. Do you still want a dedicated function to do this?

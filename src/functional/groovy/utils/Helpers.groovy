@@ -1,6 +1,6 @@
 package utils
 
-
+import static org.junit.Assert.assertTrue
 class Helpers {
     /**
     This helper method compares the contents of log file and table from database
@@ -50,10 +50,73 @@ class Helpers {
                 def secondEntry = secondTable.get(i).get(secondColumn)
                 if (firstEntry != secondEntry)
                     verdict = false
-                println firstEntry + ":" + secondEntry
+             }
+        }
+        return verdict
+    }
+
+    def compareTwoDbTables(def tables, def leftColumns, def rightColumns){
+        def verdict = true
+        def leftTable
+        def rightTable
+        assert tables.size() == 2
+        assert leftColumns.size() > 0
+        assert rightColumns.size() > 0
+        assert leftColumns.size() == rightColumns.size()
+
+        int columns = leftColumns.size() - 1
+        leftTable = tables[0]
+        rightTable = tables[1]
+        int rows = leftTable.size() - 1
+
+        for(int i = 0; i <= rows; i++) {
+            for (int j = 0; j <= columns; j++) {
+                def leftRow = leftTable.get(i)
+                def rightRow = rightTable.get(i)
+                def firstEntry = leftRow.get(leftColumns.get(j))
+                def secondEntry = rightRow.get(rightColumns.get(j))
+                if (firstEntry != secondEntry)
+                    verdict = false
             }
         }
         return verdict
+    }
+
+    def compareDbTableBeforeAndAfter(List beforeTable, List afterTable){
+        def verdict = true
+
+        def firstRow = [:]
+        if (afterTable.size() > 0){
+            firstRow = afterTable.first()
+        }
+        int columnCount = columns.size() - 1
+        beforeTable = tables[0]
+        afterTable = tables[1]
+        int rows = leftTable.size() - 1
+
+        for(int i = 0; i <= rows; i++) {
+            for (int j = 0; j <= columns; j++) {
+                def leftRow = leftTable.get(i)
+                def rightRow = rightTable.get(i)
+                def firstEntry = leftRow.get(leftColumns.get(j))
+                def secondEntry = rightRow.get(rightColumns.get(j))
+                if (firstEntry != secondEntry)
+                    verdict = false
+            }
+        }
+        return verdict
+    }
+
+    def getDbRowCounts(Map table_1){
+        return table_1.size()
+    }
+
+    boolean compareDbRowCounts(List table_1, List table_2){
+        if (table_1.size() == table_2.size()) {
+            return true
+        }else{
+            return false
+        }
     }
 
     /** Method gets second column from a log file

@@ -18,14 +18,15 @@ class BatchUtil {
      */
     def runBatch(String script){
         def ant = new AntBuilder()
-        println "\n============ Running job: "+ script + "=============="
+        ant.project.buildListeners[0].messageOutputLevel = 0
         ant.sshexec(host: server,
                 trust: true,
                 username: username,
                 password: password,
-                command: 'ls',
+                command: script,
                 outputproperty: 'result'
         )
-        return ant.project.properties.'result'
+        def result = ant.project.properties.'result'
+        return result.toString()
     }
 }

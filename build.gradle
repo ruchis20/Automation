@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-        jcenter()
         mavenCentral()
+        jcenter { url "http://jcenter.bintray.com" }
     }
     dependencies {
         classpath("com.github.samueltbrown:gradle-cucumber-plugin:0.9")
@@ -16,7 +16,7 @@ apply plugin: 'com.github.samueltbrown.cucumber'
 
 repositories {
     mavenCentral()
-    jcenter()
+    jcenter { url "http://jcenter.bintray.com" }
 }
 configurations {
     cucumberRuntime.extendsFrom(testRuntime)
@@ -36,7 +36,8 @@ dependencies {
     compile 'commons-net:commons-net:3.6'
     compile 'org.apache.ant:ant-jsch:1.10.1'
     compile 'com.jcraft:jsch:0.1.54'
-    compile files('libs/ojdbc6.jar')
+    runtime files('lib/ojdbc6.jar')
+
     cucumberRuntime "info.cukes:cucumber-groovy:${cucumberVersion}"
     compile 'org.codehaus.groovy:groovy-all:2.4.5'
     testCompile 'org.testng:testng:6.9.4'
@@ -57,20 +58,20 @@ task runTest(type: JavaExec) {
 
     main = 'cucumber.api.cli.Main'
     classpath = configurations.cucumberRuntime + sourceSets.ft.runtimeClasspath
-    def db = project.properties['db'] ?: 'mysql'
     def unixUser = project.properties['username']
     def unixPass = project.properties['password']
     systemProperties = System.getProperties()
-    systemProperties.put("db", db)
     systemProperties.put("unix_username", unixUser)
     systemProperties.put("unix_password", unixPass)
+
+    def tags = project.properties['tags'] ?: '@feature'
 
     args = ['--plugin','pretty',
                 '--plugin','html:build/reports/tests/',
                 '--plugin','json:build/reports/tests/functional.json',
                 '--plugin','junit:build/reports/tests/functional.xml',
                 '--tags','~@todo',
-                '--tags','@feature',
+                '--tags',''+tags+'',
                 '--glue','src/functional/groovy','src/functional/resources/']
 }
 

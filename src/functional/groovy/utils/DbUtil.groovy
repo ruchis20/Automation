@@ -1,26 +1,28 @@
 package utils
 
-import groovy.sql.Sql
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource
-
-import static utils.Configuration.getPropertyValue
-import static utils.Configuration.getPropertyValue
-import static utils.Configuration.getPropertyValue
+import javax.sql.DataSource
+import groovy.sql.Sql
 import static utils.Configuration.getPropertyValue
 
 class DbUtil {
     Sql sql
-    def dbSchema = getPropertyValue("oracle_schema")
     def dbServer = getPropertyValue("oracle_server")
     def dbUser = getPropertyValue("oracle_username")
     def dbPassword = getPropertyValue("oracle_password")
     def dbDriver = 'oracle.jdbc.driver.OracleDriver'
-    def dbUrl = 'jdbc:oracle:thin:@' + dbServer + ':' + dbSchema
+    def port = getPropertyValue("oracle_port")
+    def service = getPropertyValue("oracle_service")
+    def dbUrl = 'jdbc:oracle:thin:@' + dbServer + ':' + port + "/" + service
 
-    DbUtil(){}
-
-    DbUtil(MysqlDataSource dataSource) {
-        this.sql = new Sql(dataSource: dataSource)
+    DbUtil() {
+        this.sql = new Sql(
+                new MysqlDataSource(
+                        url: getPropertyValue("mysql_url"),
+                        user: getPropertyValue("mysql_username"),
+                        password: getPropertyValue("mysql_password"),
+                        allowMultiQueries: true)
+        )
     }
 
 //    DbUtil() {
@@ -31,7 +33,7 @@ class DbUtil {
         sql.execute(query)
     }
 
-    def List executeSelect(String query) {
+    def List queryDb(String query) {
         def data = []
         def rowResults = sql.rows(query)
         try {
@@ -47,7 +49,7 @@ class DbUtil {
         return data
     }
 
-    def String getQuery(String file, def binding=null) {
+    def String prepareQuery(String file, def binding=null) {
         def path = "src/functional/resources/sql/" + file
         def text = new File(path).text
         if(binding) {
@@ -58,11 +60,11 @@ class DbUtil {
         }
     }
 
-    def delete(String query) {
+    def deleteData(String query) {
         sql.executeInsert(query)
     }
 
-    def insert(String query) {
+    def insertData(String query) {
         def result = sql.executeInsert(query)
         return result.last()[0] as int
     }
