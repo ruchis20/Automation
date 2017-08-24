@@ -9,6 +9,7 @@ class FileUtil {
     def username = getUsername()
     def password = getPassword()
     def server = getPropertyValue("unix_server")
+    def port = getPropertyValue("ssh_port")
     def destination = getPropertyValue("destination_folder")
 
     FileUtil(){}
@@ -22,10 +23,11 @@ class FileUtil {
      */
     def getFile(String file){
         def ant = new AntBuilder()
-        ant.project.buildListeners[0].messageOutputLevel = 0
+        //ant.project.buildListeners[0].messageOutputLevel = 0
         new File(file).delete()
         ant.scp(
                 trust:"true",
+                port:port,
                 file:"${username}@${server}:${file}",
                 todir:"${destination}",
                 password:"${password}",
@@ -35,8 +37,10 @@ class FileUtil {
 
     boolean checkFileExists(String file){
         def ant = new AntBuilder()
-        ant.project.buildListeners[0].messageOutputLevel = 0
-        ant.sshexec(host: server,
+        //ant.project.buildListeners[0].messageOutputLevel = 0
+        ant.sshexec(
+                host: server,
+                port: port,
                 trust: true,
                 username: username,
                 password: password,
