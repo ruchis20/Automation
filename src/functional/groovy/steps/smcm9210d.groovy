@@ -47,6 +47,6 @@ When(~/^I compare the result of query "([^"]*)" with previous data$/) { String q
     comparisonResult = helpers.compareDbRowCounts(requestsBeforeJob,requestsAfterJob)
 }
 
-When(~/^then the number or records should match$/) { ->
+When(~/^then the number of records should match$/) { ->
     assertTrue(comparisonResult)
 }

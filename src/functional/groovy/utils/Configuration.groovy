@@ -4,13 +4,14 @@ class Configuration {
     static Properties props
     static String username
     static String password
+    static String db
 
     static {
         username = System.properties['unix_username']
         password = System.properties['unix_password']
+        db = System.properties['db']
         props = new Properties()
         def filePath = "config.properties"
-        println "FT -> Applying properties file from: ${filePath}."
         InputStream input = this.getClassLoader().getResourceAsStream(filePath)
         if(input) {
             props.load(input as InputStream)
@@ -27,8 +28,8 @@ class Configuration {
         password
     }
 
-    static String getDestinationFolder(){
-        getPropertyValue("destination_folder")
+    static String getDb() {
+        db
     }
 
     static String getPropertyValue(String key) {

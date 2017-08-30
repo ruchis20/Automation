@@ -9,4 +9,4 @@ Feature: SMCM9210D Job
     Then  the job jobs should complete successfully
     And the log file "HistoryUpdate.log" in "/logs" should be created
     When I compare the result of query "requests.sql" with previous data
-    And then the number or records should match
+    And then the number of records should match

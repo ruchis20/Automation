@@ -9,6 +9,8 @@ class BatchUtil {
     def username = getUsername()
     def password = getPassword()
     def server = getPropertyValue("unix_server")
+    def port = getPropertyValue("ssh_port")
+    Long jobStart
      BatchUtil(){}
 
     /**
@@ -19,12 +21,16 @@ class BatchUtil {
     def runBatch(String script){
         def ant = new AntBuilder()
         ant.project.buildListeners[0].messageOutputLevel = 0
-        ant.sshexec(host: server,
+        this.jobStart = (Long)new Date().getTime()
+        ant.sshexec(
+                host: server,
+                port: port,
                 trust: true,
                 username: username,
                 password: password,
                 command: script,
-                outputproperty: 'result'
+                outputproperty: 'result',
+                verbose:false
         )
         def result = ant.project.properties.'result'
         return result.toString()

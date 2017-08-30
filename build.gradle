@@ -60,19 +60,21 @@ task runTest(type: JavaExec) {
     classpath = configurations.cucumberRuntime + sourceSets.ft.runtimeClasspath
     def unixUser = project.properties['username']
     def unixPass = project.properties['password']
+    def db = project.properties['db']
     systemProperties = System.getProperties()
     systemProperties.put("unix_username", unixUser)
     systemProperties.put("unix_password", unixPass)
+    systemProperties.put("db", db)
 
     def tags = project.properties['tags'] ?: '@feature'
 
     args = ['--plugin','pretty',
-                '--plugin','html:build/reports/tests/',
-                '--plugin','json:build/reports/tests/functional.json',
-                '--plugin','junit:build/reports/tests/functional.xml',
-                '--tags','~@todo',
-                '--tags',''+tags+'',
-                '--glue','src/functional/groovy','src/functional/resources/']
+            '--plugin','html:build/reports/tests/',
+            '--plugin','json:build/reports/tests/functional.json',
+            '--plugin','junit:build/reports/tests/functional.xml',
+            '--tags','~@todo',
+            '--tags',''+tags+'',
+            '--glue','src/functional/groovy','src/functional/resources/']
 }
 
 
