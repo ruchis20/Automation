@@ -15,7 +15,7 @@ def fileUtil = new FileUtil()
 def batchUtil = new BatchUtil()
 boolean comparisonResult
 List dbQuery
-
+String q
 Given(~/^I have saved precondition for query "([^"]*)"$/) { String queryFile ->
     def query = dbUtil.prepareQuery(queryFile, "")
     requestsBeforeJob = dbUtil.queryDb(query)
@@ -121,3 +121,12 @@ Then(~/^the data should be insert into db$/) { ->
     billingData = dbUtil.queryDb(query)
     assert billingData.size() == 12
 }
+Given(~/^query "([^"]*)" in property file$/) { String queryKey ->
+    q=dbUtil.getQueryString(queryKey)
+}
+
+Then(~/^I can read it$/) { ->
+    String s="SELECT * FROM REQUESTS R, IPM_CLEARING_RTRVL IWHERE R.IPM_CLEARING_ID = I.CLEARING_IDAND R.ACQ_RESPONSE_CD != 'N'AND R.ACQ_NOTIF_DTTM IS NULLAND R.ARC_DB_DTTM< TRUNC(SYSDATE)AND ROWNUM <=2000AND NVL(I.P0850_PRCSS_AGRMT_ID,'GLOBAL') = 'GLOBAL"
+    assert q==s
+}
+

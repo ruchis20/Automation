@@ -13,6 +13,7 @@ apply plugin: 'groovy'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'com.github.samueltbrown.cucumber'
+apply plugin: 'maven'
 
 repositories {
     mavenCentral()
@@ -77,4 +78,18 @@ task runTest(type: JavaExec) {
             '--glue','src/functional/groovy','src/functional/resources/']
 }
 
+group = 'com.ruchi'
+version = '1.0'
 
+task writeNewPom << {
+    pom {
+        project {
+            inceptionYear '2017'
+            licenses {
+                license {
+                    name 'Automation 1.0'
+                }
+            }
+        }
+    }.writeTo("pom.xml")
+}

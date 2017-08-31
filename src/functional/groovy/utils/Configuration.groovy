@@ -1,7 +1,7 @@
 package utils
 
 class Configuration {
-    static Properties props
+    static Properties props, sql
     static String username
     static String password
     static String db
@@ -17,6 +17,14 @@ class Configuration {
             props.load(input as InputStream)
         } else {
             println "Properties file: ${filePath} cannot be loaded!!! Tests might not work!!"
+        }
+        sql = new Properties()
+        def sqlFile = "sql.properties"
+        InputStream sqlInput = this.getClassLoader().getResourceAsStream(sqlFile)
+        if(sqlInput) {
+            sql.load(sqlInput as InputStream)
+        } else {
+            println "Sql file: ${filePath} cannot be loaded!!! Tests might not work!!"
         }
     }
 
@@ -34,5 +42,9 @@ class Configuration {
 
     static String getPropertyValue(String key) {
         System.getProperty(key)?:props.get(key)
+    }
+
+    static String getQueryValue(String key) {
+        System.getProperty(key)?:sql.get(key)
     }
 }

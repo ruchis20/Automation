@@ -4,6 +4,7 @@ import com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 import groovy.sql.Sql
 import static utils.Configuration.getDb
 import static utils.Configuration.getPropertyValue
+import static utils.Configuration.getQueryValue
 
 /**
  * utility class that contains functions for database
@@ -97,6 +98,10 @@ class DbUtil {
     def insertData(String query) {
         def result = sql.executeInsert(query)
         return result.last()[0] as int
+    }
+
+    String getQueryString(String query) {
+        getQueryValue(query)
     }
 }
 

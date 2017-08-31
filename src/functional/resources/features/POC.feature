@@ -57,3 +57,7 @@ Feature: Proof of concept
     Then the data should be deleted from db
     When I insert test data in to db by running query "insert_billing.sql"
     Then the data should be insert into db
+
+  Scenario: Read query from property file
+    Given query "smcm6201d" in property file
+    Then I can read it
