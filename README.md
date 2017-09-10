@@ -107,3 +107,11 @@ For this to happen, in step definition, you need to define a binding like:
 
 When the getQuery method is called, the query is read from the file billing_01.sql
 and the variables substituted.    
+
+
+## Install oracle jdbc depenedency
+mvn org.apache.maven.plugins:maven-install-plugin:2.5.2:install-file \
+  -Dfile=lib/ojdbc6.jar -DgroupId=com.oracle -DartifactId=ojdbc6 \
+  -Dversion=11.1.0.7.0 \
+  -Dpackaging=jar \
+  -DlocalRepositoryPath=lib

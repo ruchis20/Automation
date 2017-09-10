@@ -1,1 +1,0 @@
-select * from requests where request_id in ('25859172','25859896','25859889','25859182','25859183')
