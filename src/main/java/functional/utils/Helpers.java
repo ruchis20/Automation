@@ -40,18 +40,23 @@ public class Helpers {
      */
     public boolean compareDbAndValuesFromLog(List dbData, String column, String logFile,int field, String separator){
         ArrayList logData = getNumberOfRecordsFromLogFile(logFile, field, separator);
+
         boolean verdict = true;
-        int logCount = logData.size();
-        int dbCount = dbData.size();
-        if(logCount != dbCount)
-            verdict = false;
-        if(logCount > 0 && dbCount > 0) {
-            for (int i = 0; i < logCount - 1; i++) {
-                Map dbEntry = (Map)dbData.get(i);
-                String value = dbEntry.get(column).toString();
-                if (value != logData.get(i))
-                    verdict = false;
+        try {
+            int logCount = logData.size();
+            int dbCount = dbData.size();
+            if (logCount != dbCount)
+                verdict = false;
+            if (logCount > 0 && dbCount > 0) {
+                for (int i = 0; i < logCount - 1; i++) {
+                    Map dbEntry = (Map) dbData.get(i);
+                    String value = (String)dbEntry.get(column);
+                    if (value != logData.get(i))
+                       verdict = false;
+                }
             }
+        }catch(Exception e){
+            System.out.println("Exception comparing db and log: " + e.toString());
         }
         return verdict;
     }
@@ -60,15 +65,19 @@ public class Helpers {
      * @param field, position of the field in file to read; starting with 1 from left
      * @return List of values with leading zeros trimmed
      */
-    public ArrayList getNumberOfRecordsFromLogFile(String file, int field, String separator){
+    public ArrayList<String> getNumberOfRecordsFromLogFile(String file, int field, String separator){
         String fileContents = fileUtil.getFileContents(file);
-
-        ArrayList records = new ArrayList();
-        String[] lines = fileContents.split("\n");
-        for( String line: lines){
-            String strNumberOfRecords = line.split(separator)[field];
-            String numberOfRecords = trimLeadingZeros(strNumberOfRecords);
-            records.add(numberOfRecords);
+        assert !fileContents.isEmpty();
+        ArrayList<String> records = new ArrayList<String>();
+        try {
+            String[] lines = fileContents.split("\n");
+            for (String line : lines) {
+                String strNumberOfRecords = line.split(separator)[field];
+                String numberOfRecords = trimLeadingZeros(strNumberOfRecords);
+                records.add(numberOfRecords);
+            }
+        }catch(Exception e){
+            System.out.println("Exception getting columns from log: " + e.toString());
         }
         return records;
     }
