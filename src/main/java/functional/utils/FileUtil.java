@@ -42,7 +42,7 @@ public class FileUtil {
         String stdout1 = "";
         String stdout2 = "";
         String command1 = "ls -la" + source;
-        String command2 = "ls -la" + file;
+        String command2 = "ls -la" + destination;
         try {
             Shell shell = new SshByPassword(server, port, username, password);
             stdout1 = new Shell.Plain(shell).exec(command1);

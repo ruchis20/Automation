@@ -2,10 +2,7 @@ package functional.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Helpers {
     FileUtil fileUtil = new FileUtil();
@@ -82,21 +79,12 @@ public class Helpers {
         return records;
     }
 
-    /**
-     This helper method compares two tables from database
-     * @param tables - List of List of maps containing first and second tables as well as columns to compare
-     * @param columns - List of List of strings containing columns from two tables to be compared
-     * @return if both counts and all values match, false otherwise
-     */
-
-    public boolean compareTwoDbTables(List tables, List columns){
+    public boolean compareTwoDbTables(List leftTable, String columns_1, List rightTable, String columns_2){
         boolean verdict = true;
-        assert tables.size() == 2;
-        List leftTable = (List)tables.get(0);
-        List rightTable = (List)tables.get(1);
 
-        List leftColumns = (List)columns.get(0);
-        List rightColumns = (List)columns.get(1);
+        List<String> leftColumns = Arrays.asList(columns_1.split("\\s*,\\s*"));
+        List<String> rightColumns = Arrays.asList(columns_2.split("\\s*,\\s*"));
+
         assert leftColumns.size() > 0;
         assert rightColumns.size() > 0;
         assert leftColumns.size() == rightColumns.size();
