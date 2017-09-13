@@ -103,6 +103,10 @@ public class DbUtil {
      * @return true or false
      */
     public boolean executeQuery(String query) {
+        if(query.length() <= 0) {
+            System.out.println("You tried to execute empty query");
+            return false;
+        }
         stmt = getStatement();
         try{
             return stmt.execute(query);
