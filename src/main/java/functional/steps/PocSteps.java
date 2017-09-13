@@ -21,12 +21,13 @@ public class PocSteps {
     private FileUtil fileUtil = new FileUtil();
     private Configuration conf = new Configuration();
     private Map<String,String> queries = new HashMap<String, String>();
-    boolean comparisonResult = false;
+    private boolean comparisonResult = false;
 	@Given("I have saved precondition for query $query")
     public void savePrecondtions(String query) {
 	    queries = conf.getQueries();
         String sql = queries.get(query);
         requestsBeforeJob = dbUtil.queryDb(sql);
+        assert requestsBeforeJob.size() > 0;
     }
     @When("I run job $job")
     public void runJob(String job) {
@@ -37,6 +38,7 @@ public class PocSteps {
     public void compareQueryresults(String query) {
         String sql = queries.get(query);
         requestsAfterJob = dbUtil.queryDb(sql);
+        assert requestsAfterJob.size() > 0;
     }
 
     @Then("then the number of records should match in both cases")
@@ -47,12 +49,14 @@ public class PocSteps {
 
     @Given("I have run job $job")
     public void givenIhaveRunJob(@Named("job") String job) {
-        batchUtil.runBatch(job);
+        String output = batchUtil.runBatch(job);
+        assert output.contains("cobuma");
     }
     @When("I query the database by running query $query")
     public void queryDatabase(String query) {
         String sql = queries.get(query);
         dbQueryResult = dbUtil.queryDb(sql);
+        assert dbQueryResult.size() > 0;
     }
 
     @When("I compare value of db column $column  with column number $field in $log")
@@ -72,6 +76,8 @@ public class PocSteps {
         smcm6201d = dbUtil.queryDb(sql);
         sql = queries.get(requestsSql);
         requests = dbUtil.queryDb(sql);
+        assert smcm6201d.size() > 0;
+        assert requests.size() > 0;
     }
     @When("I compare columns $request_id with columns $request_id")
     public void compareTwoDbTables(String column_1,String column_2) {

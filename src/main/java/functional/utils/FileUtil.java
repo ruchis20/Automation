@@ -27,7 +27,7 @@ public class FileUtil {
 
     public boolean checkFileExists(String file, String path){
         String stdout = "";
-        String command = "ls -la" + path;
+        String command = "ls -la " + path;
         try {
             Shell shell = new SshByPassword(server, port, username, password);
             stdout = new Shell.Plain(shell).exec(command);
@@ -41,8 +41,8 @@ public class FileUtil {
     public boolean checkFileMoved(String file, String source, String destination){
         String stdout1 = "";
         String stdout2 = "";
-        String command1 = "ls -la" + source;
-        String command2 = "ls -la" + destination;
+        String command1 = "ls -la " + source;
+        String command2 = "ls -la " + destination;
         try {
             Shell shell = new SshByPassword(server, port, username, password);
             stdout1 = new Shell.Plain(shell).exec(command1);

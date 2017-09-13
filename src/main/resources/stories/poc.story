@@ -44,6 +44,6 @@ When I compare number of records with that of log file /logs/job.log
 Then then they should match
 
 Scenario: Verify job success from log file
-Given I have run job "ls -la"
+Given I have run job "ls -la "
 When I look for keyword "SMCM4095D_. LPRUS FINISHED" in the log file /logs/batch.log
 Then I should see the job has succeeded
