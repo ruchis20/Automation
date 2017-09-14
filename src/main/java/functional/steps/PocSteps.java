@@ -22,10 +22,11 @@ public class PocSteps {
     private Configuration conf = new Configuration();
     private Map<String,String> queries = new HashMap<String, String>();
     private boolean comparisonResult = false;
+
 	@Given("I have saved precondition for query $query")
     public void savePrecondtions(String query) {
-	    queries = conf.getQueries();
-        String sql = queries.get(query);
+        String sql = dbUtil.getQueryString(query);
+        System.out.println(sql);
         requestsBeforeJob = dbUtil.queryDb(sql);
         assert requestsBeforeJob.size() > 0;
     }
@@ -36,7 +37,7 @@ public class PocSteps {
 
     @When("I compare the result of query $query with precondition")
     public void compareQueryresults(String query) {
-        String sql = queries.get(query);
+        String sql = dbUtil.getQueryString(query);
         requestsAfterJob = dbUtil.queryDb(sql);
         assert requestsAfterJob.size() > 0;
     }
@@ -54,7 +55,7 @@ public class PocSteps {
     }
     @When("I query the database by running query $query")
     public void queryDatabase(String query) {
-        String sql = queries.get(query);
+        String sql = dbUtil.getQueryString(query);
         dbQueryResult = dbUtil.queryDb(sql);
         assert dbQueryResult.size() > 0;
     }
@@ -72,9 +73,9 @@ public class PocSteps {
 
     @Given("I have run queries $smcm6201d and $requests")
     public void givenIhaveTwoDbTables(String smcm6201dSql, String requestsSql) {
-        String sql = queries.get(smcm6201dSql);
+        String sql = dbUtil.getQueryString(smcm6201dSql);
         smcm6201d = dbUtil.queryDb(sql);
-        sql = queries.get(requestsSql);
+        sql = dbUtil.getQueryString(requestsSql);
         requests = dbUtil.queryDb(sql);
         assert smcm6201d.size() > 0;
         assert requests.size() > 0;
@@ -124,7 +125,7 @@ public class PocSteps {
 
     @Given("I have run query $query")
     public void givenIhaveTwoDbTables(String query) {
-        String sql = queries.get(query);
+        String sql = dbUtil.getQueryString(query);
         smcm6201d = dbUtil.queryDb(sql);
     }
 

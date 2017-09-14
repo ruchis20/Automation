@@ -1,7 +1,5 @@
 package functional.utils;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource;
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,70 +13,28 @@ import java.util.Map;
  */
 
 public class DbUtil {
-    Configuration conf = new Configuration();
-    String dbType = conf.getDb();
-    Statement stmt;
-    /**
-     * initializes the object either with Oracle or MySql
-     * based on command line argument -Pdb=mysql or -Pdb=oracle
-     * If parameter is missing then it defaults to oracle
-     */
-    private Statement getStatement() {
-        try {
-            if (dbType.equalsIgnoreCase("mysql")) {
-                return getMySQLConnection().createStatement();
-            } else {
-                Connection conn = getOracleConnection();
-                if(conn != null)
-                    return getOracleConnection().createStatement();
-                else{
-                    System.out.println("No connection established! Cannot create statement");
-                    return null;
-                }
-            }
-        }catch (Exception e){
-            System.out.println("Exception creating statement:" + e.getMessage());
-            return null;
-        }
-    }
+    private Configuration conf = new Configuration();
 
-    private Connection getMySQLConnection() {
-        Connection conn = null;
-        MysqlDataSource ds = new MysqlConnectionPoolDataSource();
-        Map<String,String> properties = conf.getProperties();
-        ds.setURL(properties.get("mysql_url"));
-        ds.setUser(properties.get("mysql_username"));
-        ds.setPassword(properties.get("mysql_password"));
-        try{
-            conn = ds.getConnection();
-        }catch (Exception e){
-            System.out.println(e.toString());
-        }
-        return conn;
-    }
-
-    private Connection getOracleConnection() throws Exception {
+    private Connection getConnection(){
         Connection conn = null;
         Map<String,String> properties = conf.getProperties();
         String serverName = properties.get("oracle_server");
         String portNumber = properties.get("oracle_port");
         String service = properties.get("oracle_service");
-        String oracleUrl = "jdbc:oracle:thin:@//" + serverName + ':' + portNumber + "/" + service;
         String username = properties.get("oracle_username");
         String password = properties.get("oracle_password");
+        String oracleUrl = "jdbc:oracle:thin:@//" + serverName + ':' + portNumber + "/" + service;
 
         try {
-
-            Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
-
-        } catch (ClassNotFoundException e) {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+        }catch(Exception e){
             System.out.println("Where is your Oracle JDBC Driver?");
             e.printStackTrace();
             return null;
         }
         try{
             conn = DriverManager.getConnection(oracleUrl, username, password);
-        }catch (Exception e){
+        }catch(Exception e){
             System.out.println(e.getMessage());
             System.out.println("Exception creating oracle connection:" + e.getMessage());
         }
@@ -91,9 +47,21 @@ public class DbUtil {
      */
     public List queryDb(String query) {
         List<Object> results = new ArrayList<Object>();
-        stmt = getStatement();
+        Connection conn = getConnection();
+        Statement stmt;
+        ResultSet resultSet;
+
         try {
-            ResultSet resultSet = stmt.executeQuery(query);
+            stmt =  conn.createStatement();
+            resultSet = stmt.executeQuery(query);
+        }catch(Exception e){
+            System.out.println("Exception running query: " + e.toString());
+            System.out.println(query);
+            e.printStackTrace();
+            return null;
+        }
+
+        try {
             ResultSetMetaData rsmd = resultSet.getMetaData();
             int columnCount = rsmd.getColumnCount();
             ArrayList<String> columns = new ArrayList<String>();
@@ -108,32 +76,31 @@ public class DbUtil {
                 }
             }
         }catch(Exception e){
-            System.out.println("Exception: " + e.toString());
+            System.out.println("Exception processing resultset: " + e.toString());
+            System.out.println(query);
+            e.printStackTrace();
+        } finally {
+            try {
+                stmt.close();
+            } catch (Exception e) {
+                System.out.println("Exception closing statement: " + e.toString());
+            }
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                System.out.println("Exception closing connection: " + e.toString());
+            }
         }
         return results;
     }
 
-    /**
-     * Deletes data from table
-     * @param  query
-     * @return true or false
-     */
-    public boolean executeQuery(String query) {
-        if(query.length() <= 0) {
-            System.out.println("You tried to execute empty query");
-            return false;
-        }
-        stmt = getStatement();
-        try{
-            return stmt.execute(query);
-        }catch (Exception e){
-            System.out.println(e.toString());
-            return false;
-        }
-    }
-
     public String getQueryString(String query) {
-        Map<String,String> queries = conf.getQueries();
-        return queries.get(query);
+        try {
+            Map<String,String> queries = conf.getQueries();
+            return queries.get(query);
+        } catch (Exception e) {
+            System.out.println("ERROR getting query from file: " + e.toString());
+            return null;
+        }
     }
 }

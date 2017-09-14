@@ -6,7 +6,7 @@ I want a set of automation functionality
 So that I can implement automated tests
 
 Scenario: Verify comparison of query results with preconditions
-Given I have saved precondition for query smcm6201d_mysql
+Given I have saved precondition for query smcm6201d
 When I run job ls
 When I compare the result of query billing with precondition
 Then then the number of records should match in both cases
