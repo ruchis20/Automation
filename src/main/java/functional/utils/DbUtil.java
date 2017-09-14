@@ -69,7 +69,7 @@ public class DbUtil {
 
         try {
 
-            Class.forName("oracle.jdbc.driver.OracleDriver");
+            Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
 
         } catch (ClassNotFoundException e) {
             System.out.println("Where is your Oracle JDBC Driver?");
