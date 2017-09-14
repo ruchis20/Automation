@@ -37,7 +37,7 @@ public class DbUtil {
                 }
             }
         }catch (Exception e){
-            System.out.println("Exception creating statement:" + e.toString());
+            System.out.println("Exception creating statement:" + e.getMessage());
             return null;
         }
     }
@@ -66,12 +66,21 @@ public class DbUtil {
         String oracleUrl = "jdbc:oracle:thin:@//" + serverName + ':' + portNumber + "/" + service;
         String username = properties.get("oracle_username");
         String password = properties.get("oracle_password");
-        try{
+
+        try {
+
             Class.forName("oracle.jdbc.driver.OracleDriver");
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Where is your Oracle JDBC Driver?");
+            e.printStackTrace();
+            return null;
+        }
+        try{
             conn = DriverManager.getConnection(oracleUrl, username, password);
         }catch (Exception e){
-            System.out.println(e.toString());
-            System.out.println("Exception creating oracle connection:" + e.toString());
+            System.out.println(e.getMessage());
+            System.out.println("Exception creating oracle connection:" + e.getMessage());
         }
         return conn;
     }
