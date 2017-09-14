@@ -28,10 +28,16 @@ public class DbUtil {
             if (dbType.equalsIgnoreCase("mysql")) {
                 return getMySQLConnection().createStatement();
             } else {
-                return getOracleConnection().createStatement();
+                Connection conn = getOracleConnection();
+                if(conn != null)
+                    return getOracleConnection().createStatement();
+                else{
+                    System.out.println("No connection established! Cannot create statement");
+                    return null;
+                }
             }
         }catch (Exception e){
-            System.out.println("Exception creatin statement:" + e.toString());
+            System.out.println("Exception creating statement:" + e.toString());
             return null;
         }
     }
@@ -54,17 +60,18 @@ public class DbUtil {
     private Connection getOracleConnection() throws Exception {
         Connection conn = null;
         Map<String,String> properties = conf.getProperties();
-        Class.forName("oracle.jdbc.driver.OracleDriver");
         String serverName = properties.get("oracle_server");
         String portNumber = properties.get("oracle_port");
         String service = properties.get("oracle_service");
-        String oracleUrl = "jdbc:oracle:thin:@" + serverName + ':' + portNumber + "/" + service;
+        String oracleUrl = "jdbc:oracle:thin:@//" + serverName + ':' + portNumber + "/" + service;
         String username = properties.get("oracle_username");
         String password = properties.get("oracle_password");
         try{
+            Class.forName("oracle.jdbc.driver.OracleDriver");
             conn = DriverManager.getConnection(oracleUrl, username, password);
         }catch (Exception e){
             System.out.println(e.toString());
+            System.out.println("Exception creating oracle connection:" + e.toString());
         }
         return conn;
     }
