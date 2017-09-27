@@ -69,15 +69,14 @@ public class DbUtil {
                  columns.add(rsmd.getColumnName(i));
             }
             while (resultSet.next()) {
+                Map<String,Object> row = new HashMap<String,Object>();
                 for (String columnName : columns) {
-                    Map<String,String> data = new HashMap<String,String>();
-                    data.put(columnName, resultSet.getString(columnName));
-                    results.add(data);
+                    row.put(columnName, resultSet.getString(columnName));
                 }
+                results.add(row);
             }
         }catch(Exception e){
             System.out.println("Exception processing resultset: " + e.toString());
-            System.out.println(query);
             e.printStackTrace();
         } finally {
             try {

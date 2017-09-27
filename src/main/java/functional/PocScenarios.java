@@ -42,7 +42,7 @@ public class PocScenarios extends JUnitStories {
     
     public PocScenarios() {
         configuredEmbedder().embedderControls().doGenerateViewAfterStories(true).doIgnoreFailureInStories(true)
-                .doIgnoreFailureInView(true).useThreads(2).useStoryTimeoutInSecs(60);
+                .doIgnoreFailureInView(true).useThreads(2).ignoreFailureInStories();
     }
 
     @Override

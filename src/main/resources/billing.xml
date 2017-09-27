@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FulfillmentMessage>
+    <Header>
+        <Name>MCom MDS Notif</Name>
+        <ProcessDate>2017-09-08</ProcessDate>
+        <RowCount>1</RowCount>
+    </Header>
+    <Description>MDS Debit (Representment cycle) Fulfillment file where one or both customers process via Odysseus</Description>
+    <DataFields>
+        <SwitchSerialNbr name="SwtchNum">428354177</SwitchSerialNbr>
+        <OriginalSerialNbr name="OrgNum">322416318</OriginalSerialNbr>
+        <AcquirerInstitutionNumber name="AcqInstNum">1991001008</AcquirerInstitutionNumber>
+        <AcquirerProcessorNumber name="AcqProcNum">9000000052</AcquirerProcessorNumber>
+        <IssuerInstitutionNumber name="IssInstNum">1700016475</IssuerInstitutionNumber>
+        <IssuerProcessorNumber name="IssProcNum">9000000053</IssuerProcessorNumber>
+        <PAN name="PAN">0005499888800000113</PAN>
+        <DebitAmount name="DbtAmt">121.43</DebitAmount>
+        <LocalAmount name="LocalAmt">20000</LocalAmount>
+        <MasterComRecordID name="McomId">117991558</MasterComRecordID>
+        <MasterDebitCBID name="McomDbtId">2659187</MasterDebitCBID>
+        <SenderCommitDate name="SendDttm">2004-06-09 00:00:00</SenderCommitDate>
+        <MasterComImageMetadata name="McomImgMetadata">2e9e0d48</MasterComImageMetadata>
+    </DataFields>
+</FulfillmentMessage>

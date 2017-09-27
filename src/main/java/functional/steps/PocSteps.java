@@ -1,13 +1,11 @@
 package functional.steps;
 
 import org.jbehave.core.annotations.*;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import functional.utils.*;
+import org.junit.Assert;
 
 public class PocSteps {
 	private List requestsBeforeJob = null;
@@ -19,45 +17,43 @@ public class PocSteps {
     private BatchUtil batchUtil = new BatchUtil();
     private Helpers helpers = new Helpers();
     private FileUtil fileUtil = new FileUtil();
-    private Configuration conf = new Configuration();
-    private Map<String,String> queries = new HashMap<String, String>();
     private boolean comparisonResult = false;
+    private List xmlValues = null;
 
 	@Given("I have saved precondition for query $query")
     public void savePrecondtions(String query) {
         String sql = dbUtil.getQueryString(query);
-        System.out.println(sql);
         requestsBeforeJob = dbUtil.queryDb(sql);
-        assert requestsBeforeJob.size() > 0;
+        Assert.assertTrue(requestsAfterJob.size() > 0);
     }
     @When("I run job $job")
     public void runJob(String job) {
-        batchUtil.runBatch(job);
+        Assert.assertTrue(batchUtil.runBatch(job).contains("some text printed on screen by the job"));
     }
 
     @When("I compare the result of query $query with precondition")
     public void compareQueryresults(String query) {
         String sql = dbUtil.getQueryString(query);
         requestsAfterJob = dbUtil.queryDb(sql);
-        assert requestsAfterJob.size() > 0;
+        Assert.assertTrue(requestsAfterJob.size() > 0);
     }
 
     @Then("then the number of records should match in both cases")
     public void resultsShouldMatch() {
         boolean comparisonResult = helpers.compareDbRowCounts(requestsBeforeJob,requestsAfterJob);
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
     }
 
     @Given("I have run job $job")
     public void givenIhaveRunJob(@Named("job") String job) {
         String output = batchUtil.runBatch(job);
-        assert output.contains("cobuma");
+        Assert.assertTrue(output.contains("cobuma"));
     }
     @When("I query the database by running query $query")
     public void queryDatabase(String query) {
         String sql = dbUtil.getQueryString(query);
         dbQueryResult = dbUtil.queryDb(sql);
-        assert dbQueryResult.size() > 0;
+        Assert.assertTrue(dbQueryResult.size() > 0);
     }
 
     @When("I compare value of db column $column  with column number $field in $log")
@@ -68,7 +64,7 @@ public class PocSteps {
 
     @Then("then the two sets should match")
     public void dbColumnValuesAndLogFieldValuesShouldMatch() {
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
     }
 
     @Given("I have run queries $smcm6201d and $requests")
@@ -77,8 +73,8 @@ public class PocSteps {
         smcm6201d = dbUtil.queryDb(sql);
         sql = dbUtil.getQueryString(requestsSql);
         requests = dbUtil.queryDb(sql);
-        assert smcm6201d.size() > 0;
-        assert requests.size() > 0;
+        Assert.assertTrue(smcm6201d.size() > 0);
+        Assert.assertTrue(requests.size() > 0);
     }
     @When("I compare columns $request_id with columns $request_id")
     public void compareTwoDbTables(String column_1,String column_2) {
@@ -87,7 +83,7 @@ public class PocSteps {
 
     @Then("then the two query results should match")
     public void thenTheTwoQueryResultsShouldMatch() {
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
     }
 
     @Given("I have file $file")
@@ -104,13 +100,13 @@ public class PocSteps {
     @Then("the file $file should be moved from $source to $destination")
     public void thenTheFileShouldBeMovedToDestinationFolder(String file, String source, String destination) {
         comparisonResult = fileUtil.checkFileMoved(file,source,destination);
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
     }
 
     @Then("the log file $file should be created in $path")
     public void thenTheFileShouldBeCreatedInDestinationFolder(String file, String destination) {
         comparisonResult = fileUtil.checkFileExists(file,destination);
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
     }
 
     @When("I compare number of records in the two tables")
@@ -120,7 +116,7 @@ public class PocSteps {
 
     @Then("then they should match")
     public void thenTheTwoTablesShouldMatch() {
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
     }
 
     @Given("I have run query $query")
@@ -141,6 +137,42 @@ public class PocSteps {
 
     @Then("I should see the job has succeeded")
     public void ishouldSeeTheJobSucceeded() {
-        assert comparisonResult;
+        Assert.assertTrue(comparisonResult);
+    }
+    
+    @Given("I have read values of attributes $attributes in node $node from XML file $xmlfile")
+    public void givenIhaveReadXmlValues(@Named("attributes") String attributes, @Named("node") String node, @Named("xmlfile") String xmlfile){
+
+        /**
+         * for testing purpose only, we are going to read xml from resources directory.
+         * in read world, you use FileUtil to get contents from remote Unix machine, e.g.
+         * String xml = getFileContents(xmlfile);
+         * xmlValues = helpers.readXML(xml,node,attributes);
+         */
+        try{
+            String xml = new String(Files.readAllBytes(Paths.get("src/main/resources/" + xmlfile)));
+            xmlValues = helpers.readXML(xml,node,attributes);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+    }
+
+    @When("I compare values of xml attributes $attributes with db query columns $columns")
+    public void whenIcompareXmlWithDbResults(@Named("attributes") String attributes, @Named("columns") String columns) {
+
+        /**
+         * Initializing dbQuery for testing purpose only. In real world you would query db and store the result in a list
+         */
+        List<Map<String,String>> dbQuery = new ArrayList();
+
+        try {
+            HashMap firstMap = new HashMap();
+            firstMap.put("record_id", "117991558");
+            dbQuery.add(firstMap);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        comparisonResult = helpers.compareDbTableWithXmlValues(dbQuery,columns,xmlValues,attributes);
     }
 }

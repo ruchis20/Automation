@@ -47,3 +47,8 @@ Scenario: Verify job success from log file
 Given I have run job "ls -la "
 When I look for keyword "SMCM4095D_. LPRUS FINISHED" in the log file /logs/batch.log
 Then I should see the job has succeeded
+
+Scenario: Compare db result with xml values
+Given I have read values of attributes MasterComRecordID in node DataFields from XML file billing.xml
+When I compare values of xml attributes MasterComRecordID with db query columns record_id
+Then then they should match

@@ -1,8 +1,17 @@
 package functional.utils;
 
+import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.junit.Assert;
+import org.w3c.dom.*;
+import org.xml.sax.InputSource;
+
+import java.io.File;
 
 public class Helpers {
     FileUtil fileUtil = new FileUtil();
@@ -187,5 +196,100 @@ public class Helpers {
         if (i == 0)
             return source;
         return source.substring(i);
+    }
+
+    /**
+     * Extracts values of attributes from XML string
+     * @param inputXml - string containing the xml
+     * @param nodeName - name of the node wcontaining the attrivates
+     * @param attributeString - comma separated list of attributes to be extracted
+     * @return map of the attributes and their values
+     */
+    public List readXML(String inputXml, String nodeName, String attributeString){
+        List<Object> results = new ArrayList<Object>();
+        List<String> attributes = Arrays.asList(attributeString.split("\\s*,\\s*"));
+        try {
+
+            DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+            InputSource inputStream = new InputSource(new StringReader(inputXml));
+            Document doc = docBuilder.parse(inputStream);
+
+            NodeList nodeList = doc.getElementsByTagName(nodeName);
+
+            for (int count = 0; count < nodeList.getLength(); count++) {
+
+                Node node = nodeList.item(count);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Map<String,String> map = new HashMap<String,String>();
+                    Element element = (Element) node;
+
+                    for(String attribute : attributes){
+                        String value = element.getElementsByTagName(attribute).item(0).getTextContent();
+                        map.put(attribute, value);
+                    }
+                    results.add(map);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    /**
+     * Compares DB query result with attribute values extracted from an xml
+     * @param dbTable - resultset of the db query we want to compare
+     * @param xmlData - list of data columns to be compared
+     * @param attributes - Map of xml attributes and their values
+     * @return true if all records match (row counts and individual fields), otherwise false
+     */
+
+    public boolean compareDbTableWithXmlValues(List dbTable, String columns, List xmlData, String attributes){
+        boolean verdict = true;
+
+        List<String> dbColumns = Arrays.asList(columns.split("\\s*,\\s*"));
+        List<String> xmlAttributes = Arrays.asList(attributes.split("\\s*,\\s*"));
+
+        if (dbTable.size()  <= 0) {
+            System.out.println("ERROR: DB records is empty ********");
+            return false;
+        }
+        if (xmlData.size()  <= 0) {
+            System.out.println("ERROR: XML data is empty ********");
+            return false;
+        }
+        if (dbColumns.size()  <= 0) {
+            System.out.println("ERROR: Expecting at least one DB column to compare ********");
+            return false;
+        }
+
+        if (xmlAttributes.size()  <= 0) {
+            System.out.println("ERROR: Expecting at least one xml attribute to compare ********");
+            return false;
+        }
+        Assert.assertTrue(dbTable.size() == xmlData.size());
+
+        if (dbTable.size() != xmlData.size()) {
+            System.out.println("ERROR: Number of records in DB and XML do not match ********");
+            return false;
+        }
+
+        int columnCount = dbColumns.size() - 1;
+        int rowCount = dbTable.size() - 1;
+        for(int i = 0; i <= rowCount; i++) {
+            for (int j = 0; j <= columnCount; j++) {
+                Map dbRow = (Map)dbTable.get(i);
+                Map xmlRow = (Map)xmlData.get(i);
+                String firstEntry = (String)dbRow.get(dbColumns.get(j));
+                String secondEntry = (String)xmlRow.get(xmlAttributes.get(j));
+                if (!firstEntry.equals(secondEntry)) {
+                    verdict = false;
+                    int row = i + 1;
+                    System.out.println("ERROR: Comparison failed. Expecting " + firstEntry + " but found " + secondEntry + " in row " + row + " ********");
+                }
+            }
+        }
+        return verdict;
     }
 }
