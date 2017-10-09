@@ -28,7 +28,11 @@ public class PocSteps {
     }
     @When("I run job $job")
     public void runJob(String job) {
-        Assert.assertTrue(batchUtil.runBatch(job).contains("some text printed on screen by the job"));
+	    String output = batchUtil.runJob(job);
+	    System.out.println("**********************************************");
+        System.out.println(output);
+        System.out.println("**********************************************");
+        Assert.assertTrue(output.contains("some text printed on screen by the job"));
     }
 
     @When("I compare the result of query $query with precondition")

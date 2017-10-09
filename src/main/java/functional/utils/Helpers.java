@@ -6,12 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
-
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
-
-import java.io.File;
 
 public class Helpers {
     FileUtil fileUtil = new FileUtil();
@@ -291,5 +289,30 @@ public class Helpers {
             }
         }
         return verdict;
+    }
+
+    public String updateTextFileWithDbValues(List dbValues, String[] inputString,
+                                             Map<String,Integer> expendibles, String separator){
+        String newContent = null;
+        int count = dbValues.size();
+        for ( int i = 0; i < count - 1; i++){
+            String line = inputString[i];
+            Map row = (Map)dbValues.get(i);
+            String[] fields = line.split(separator);
+            for (Map.Entry<String, Integer> entry : expendibles.entrySet())
+            {
+                String column = entry.getKey();
+                int field = entry.getValue() - 1;
+                int dbValue = Integer.parseInt(row.get(column).toString());
+                fields[field] = String.format("%012d", dbValue);
+            }
+            String newLine = StringUtils.join(fields, ',') + "\n";
+            newContent += newLine;
+            System.out.println("*******************************************************");
+            System.out.println("Old: "+ line);
+            System.out.println("New: "+ newLine);
+            System.out.println("*******************************************************");
+        }
+        return newContent;
     }
 }

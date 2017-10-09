@@ -2,7 +2,8 @@ package functional.utils;
 
 import com.jcabi.ssh.Shell;
 import com.jcabi.ssh.SshByPassword;
-
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public class FileUtil {
@@ -47,6 +48,33 @@ public class FileUtil {
             Shell shell = new SshByPassword(server, port, username, password);
             stdout1 = new Shell.Plain(shell).exec(command1);
             stdout2 = new Shell.Plain(shell).exec(command2);
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
+        if (!stdout1.contains(file) && stdout2.contains(file)) return  true;
+        else return false;
+    }
+
+    public String[] readLocalFile(String file){
+        String contents = "";
+        try {
+            contents = new String(Files.readAllBytes(Paths.get(file)));
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
+        return contents.split("\n");
+    }
+
+    public boolean writeToRemoteFile(String file, String destination, String contents){
+        String stdout1 = "";
+        String stdout2 = "";
+        String fullPath = destination + "/" + file;
+        String write = "echo " + contents + " > " + fullPath;
+        String check = "ls -la " + destination;
+        try {
+            Shell shell = new SshByPassword(server, port, username, password);
+            stdout1 = new Shell.Plain(shell).exec(write);
+            stdout2 = new Shell.Plain(shell).exec(check);
         }catch (Exception e){
             System.out.println(e.toString());
         }
