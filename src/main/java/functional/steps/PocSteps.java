@@ -16,7 +16,6 @@ public class PocSteps {
     private DbUtil dbUtil = new DbUtil();
     private BatchUtil batchUtil = new BatchUtil();
     private Helpers helpers = new Helpers();
-    private FileUtil fileUtil = new FileUtil();
     private boolean comparisonResult = false;
     private List xmlValues = null;
 
@@ -50,7 +49,7 @@ public class PocSteps {
 
     @Given("I have run job $job")
     public void givenIhaveRunJob(@Named("job") String job) {
-        String output = batchUtil.runBatch(job);
+        String output = batchUtil.runJob(job);
         Assert.assertTrue(output.contains("cobuma"));
     }
     @When("I query the database by running query $query")
@@ -93,23 +92,23 @@ public class PocSteps {
     @Given("I have file $file")
     public void givenIhaveAFileBeforeJob(String file) {
         String job = "echo 'test' > " + file;
-        batchUtil.runBatch(job);
+        batchUtil.runJob(job);
     }
     @When("I run job mv $source $destination")
     public void iRunAJobThatMovesTheFile(String source,String destination) {
         String job = "mv " + source + " " + destination;
-        batchUtil.runBatch(job);
+        batchUtil.runJob(job);
     }
 
     @Then("the file $file should be moved from $source to $destination")
     public void thenTheFileShouldBeMovedToDestinationFolder(String file, String source, String destination) {
-        comparisonResult = fileUtil.checkFileMoved(file,source,destination);
+        comparisonResult = batchUtil.checkFileMoved(file,source,destination);
         Assert.assertTrue(comparisonResult);
     }
 
     @Then("the log file $file should be created in $path")
     public void thenTheFileShouldBeCreatedInDestinationFolder(String file, String destination) {
-        comparisonResult = fileUtil.checkFileExists(file,destination);
+        comparisonResult = batchUtil.checkFileExists(file,destination);
         Assert.assertTrue(comparisonResult);
     }
 

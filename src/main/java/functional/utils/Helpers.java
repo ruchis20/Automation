@@ -12,7 +12,6 @@ import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 public class Helpers {
-    FileUtil fileUtil = new FileUtil();
     BatchUtil batchUtil = new BatchUtil();
 
     public boolean compareCountsOfDBAndLog(List table, String logFile){
@@ -29,7 +28,7 @@ public class Helpers {
      * @return number of records
      */
     public int getCountFromLogFile(String file){
-        String fileContents = fileUtil.getFileContents(file);
+        String fileContents = batchUtil.getFileContents(file);
         return fileContents.split("\n").length;
     }
 
@@ -70,7 +69,7 @@ public class Helpers {
      * @return List of values with leading zeros trimmed
      */
     public ArrayList<String> getNumberOfRecordsFromLogFile(String file, int field, String separator){
-        String fileContents = fileUtil.getFileContents(file);
+        String fileContents = batchUtil.getFileContents(file);
         assert !fileContents.isEmpty();
         ArrayList<String> records = new ArrayList<String>();
         try {
@@ -145,7 +144,7 @@ public class Helpers {
      * @return true if found and later that than jon timestamp or false otherwise
      */
     public boolean verifyJobSuccessInLogFile(String log, String keyword){
-        String fileContents = fileUtil.getFileContents(log);
+        String fileContents = batchUtil.getFileContents(log);
         boolean  found = false;
         String[] lines = fileContents.split("\n");
         for (String line: lines){
