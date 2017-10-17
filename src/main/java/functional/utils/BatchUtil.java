@@ -65,12 +65,10 @@ public class BatchUtil {
     public Session connectSession() {
         JSch.setLogger(new MyLogger());
         JSch js = new JSch();
-        Properties config = new Properties();
         try {
             Session s = js.getSession(this.username, this.server, this.port);
-            config.put("StrictHostKeyChecking", "no");
-            config.put("PreferredAuthentications", "password");
-            s.setConfig(config);
+            s.setConfig("PreferredAuthentications", "password");
+            s.setConfig("StrictHostKeyChecking", "no");
             s.setPassword(this.password);
             s.connect();
             return s;

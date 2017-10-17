@@ -16,6 +16,7 @@ public class PocSteps {
     private DbUtil dbUtil = new DbUtil();
     private BatchUtil batchUtil = new BatchUtil();
     private Helpers helpers = new Helpers();
+    private Unix unix = new Unix();
     private boolean comparisonResult = false;
     private List xmlValues = null;
 
@@ -27,7 +28,7 @@ public class PocSteps {
     }
     @When("I run job $job")
     public void runJob(String job) {
-	    String output = batchUtil.runJob(job);
+	    String output = unix.runJob(job);
 	    System.out.println("**********************************************");
         System.out.println(output);
         System.out.println("**********************************************");
