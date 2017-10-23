@@ -1,9 +1,6 @@
 package functional.utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Map;
 
 import ch.ethz.ssh2.Connection;
@@ -16,6 +13,7 @@ public class Unix {
     private String password = conf.getPassword();
     private Map<String, String> properties = conf.getProperties();
     private String server = properties.get("unix_server");
+    private String keyLocation = properties.get("key_file");
     private int port = Integer.parseInt(properties.get("ssh_port"));
 
     public String runJob(String command) {
@@ -24,7 +22,9 @@ public class Unix {
         {
             Connection conn = new Connection(server, port);
             conn.connect();
-            boolean isAuthenticated = conn.authenticateWithPassword(username, password);
+
+            File keyFile = new File(keyLocation);
+            boolean isAuthenticated = conn.authenticateWithPublicKey(username, keyFile, password);
 
             if (isAuthenticated == false)
                 throw new IOException("Authentication failed.");
