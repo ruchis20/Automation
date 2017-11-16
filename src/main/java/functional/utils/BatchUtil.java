@@ -2,6 +2,7 @@ package functional.utils;
 
 import com.jcraft.jsch.*;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -39,6 +40,47 @@ public class BatchUtil {
             e.printStackTrace();
         }
         return stdout;
+    }
+
+    public String runCommand(String command) {
+        String response = "";
+        try{
+
+            JSch jsch = new JSch();
+
+            java.util.Properties config = new java.util.Properties();
+            config.put("StrictHostKeyChecking", "no");
+            Session session=jsch.getSession(username, server, 2222);
+
+            UserInfo ui = new MyUserInfo();
+            session.setUserInfo(ui);
+            session.setConfig(config);
+            session.connect();
+
+            Channel channel = session.openChannel("shell");
+            OutputStream ops = channel.getOutputStream();
+            PrintStream ps = new PrintStream(ops);
+            channel.connect();
+            ps.println("bash");
+            ps.println("sesudo mcom");
+            ps.println(command);
+            ps.flush();
+            ps.close();
+
+            InputStream in = channel.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+
+            String output;
+            while ((output = reader.readLine()) != null)
+                response += output;
+            reader.close();
+            channel.disconnect();
+        }catch(Exception e){
+            e.printStackTrace();
+
+        }
+        return response;
     }
 
     private ChannelExec connectChannel(Session s) {
