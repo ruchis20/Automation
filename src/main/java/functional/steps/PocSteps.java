@@ -16,7 +16,6 @@ public class PocSteps {
     private DbUtil dbUtil = new DbUtil();
     private BatchUtil batchUtil = new BatchUtil();
     private Helpers helpers = new Helpers();
-    private Unix unix = new Unix();
     private boolean comparisonResult = false;
     private List xmlValues = null;
 
@@ -27,11 +26,8 @@ public class PocSteps {
         Assert.assertTrue(requestsAfterJob.size() > 0);
     }
     @When("I run job $job")
-    public void runJob(String job) {
-	    String output = unix.runJob(job);
-	    System.out.println("**********************************************");
-        System.out.println(output);
-        System.out.println("**********************************************");
+    public void runCommand(String job) {
+	    String output = batchUtil.runCommand(job);
         Assert.assertTrue(output.contains("some text printed on screen by the job"));
     }
 
@@ -50,7 +46,7 @@ public class PocSteps {
 
     @Given("I have run job $job")
     public void givenIhaveRunJob(@Named("job") String job) {
-        String output = batchUtil.runJob(job);
+        String output = batchUtil.runCommand(job);
         Assert.assertTrue(output.contains("cobuma"));
     }
     @When("I query the database by running query $query")
@@ -93,12 +89,12 @@ public class PocSteps {
     @Given("I have file $file")
     public void givenIhaveAFileBeforeJob(String file) {
         String job = "echo 'test' > " + file;
-        batchUtil.runJob(job);
+        batchUtil.runCommand(job);
     }
     @When("I run job mv $source $destination")
     public void iRunAJobThatMovesTheFile(String source,String destination) {
         String job = "mv " + source + " " + destination;
-        batchUtil.runJob(job);
+        batchUtil.runCommand(job);
     }
 
     @Then("the file $file should be moved from $source to $destination")

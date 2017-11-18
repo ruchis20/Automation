@@ -2,44 +2,20 @@ package functional.utils;
 
 import com.jcraft.jsch.*;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.Map;
-import java.util.Properties;
 
 public class BatchUtil {
     Configuration conf = new Configuration();
     private String username = conf.getUsername();
-    private String password = conf.getPassword();
     private Map<String, String> properties = conf.getProperties();
     private String server = properties.get("unix_server");
     private int port = Integer.parseInt(properties.get("ssh_port"));
 
     public long getJobStart() {
         return new Date().getTime();
-    }
-
-    public String runJob(String command) {
-        String stdout = "";
-        try {
-            Session session = connectSession();
-            ChannelExec ce = connectChannel(session);
-            ce.setCommand(command);
-            ce.setErrStream(System.err);
-            ce.connect();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ce.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stdout = stdout + "\n" + line;
-            }
-            ce.disconnect();
-            disconnectSession(session);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return stdout;
     }
 
     public String runCommand(String command) {
@@ -50,7 +26,7 @@ public class BatchUtil {
 
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
-            Session session=jsch.getSession(username, server, 2222);
+            Session session=jsch.getSession(username, server, port);
 
             UserInfo ui = new MyUserInfo();
             session.setUserInfo(ui);
@@ -61,21 +37,20 @@ public class BatchUtil {
             OutputStream ops = channel.getOutputStream();
             PrintStream ps = new PrintStream(ops);
             channel.connect();
+            InputStream input = channel.getInputStream();
+
             ps.println("bash");
-            ps.println("sesudo mcom");
+            ps.println("root");
             ps.println(command);
+            ps.println("exit");
             ps.flush();
             ps.close();
 
-            InputStream in = channel.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            response = printResult(input, channel);
 
-
-            String output;
-            while ((output = reader.readLine()) != null)
-                response += output;
-            reader.close();
             channel.disconnect();
+            session.disconnect();
+
         }catch(Exception e){
             e.printStackTrace();
 
@@ -83,61 +58,51 @@ public class BatchUtil {
         return response;
     }
 
-    private ChannelExec connectChannel(Session s) {
-        ChannelExec ce = new ChannelExec();
-        try {
-            Channel c = s.openChannel("exec");
-            ce = (ChannelExec) c;
-        } catch (Exception e) {
-            e.printStackTrace();
+    private String printResult(InputStream input,
+                                    Channel channel) throws Exception
+    {
+        int SIZE = 1024;
+        byte[] tmp = new byte[SIZE];
+        String out = "";
+        while (true)
+        {
+            while (input.available() > 0)
+            {
+                int i = input.read(tmp, 0, SIZE);
+                if(i < 0)
+                    break;
+                out += new String(tmp, 0, i);
+                System.out.print(new String(tmp, 0, i));
+            }
+            if(channel.isClosed())
+            {
+                System.out.println("exit-status: " + channel.getExitStatus());
+                break;
+            }
+            try{Thread.sleep(300);}
+            catch (Exception ee){ee.printStackTrace();}
         }
-        return ce;
-    }
-
-    private void disconnectSession(Session session) {
-
-        try {
-            session.disconnect();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Session connectSession() {
-        JSch.setLogger(new MyLogger());
-        JSch js = new JSch();
-        try {
-            Session s = js.getSession(this.username, this.server, this.port);
-            s.setConfig("PreferredAuthentications", "password");
-            s.setConfig("StrictHostKeyChecking", "no");
-            s.setPassword(this.password);
-            s.connect();
-            return s;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        return out;
     }
 
     public String getFileContents(String file) {
 
         String command = "cat " + file;
-        return runJob(command);
+        return runCommand(command);
     }
 
     public boolean checkFileExists(String file, String path) {
         String command = "ls -la " + path;
-        String stdout = runJob(command);
+        String stdout = runCommand(command);
         if (stdout.contains(file)) return true;
         else return false;
     }
 
     public boolean checkFileMoved(String file, String source, String destination) {
         String command = "ls -la " + source;
-        String stdout1 = runJob(command);
+        String stdout1 = runCommand(command);
         command = "ls -la " + destination;
-        String stdout2 = runJob(command);
+        String stdout2 = runCommand(command);
 
         if (!stdout1.contains(file) && stdout2.contains(file)) return true;
         else return false;
@@ -156,7 +121,7 @@ public class BatchUtil {
     public boolean writeToRemoteFile(String file, String destination, String contents) {
         String fullPath = destination + "/" + file;
         String write = "echo " + contents + " > " + fullPath;
-        runJob(write);
+        runCommand(write);
         return checkFileExists(file, destination);
     }
 

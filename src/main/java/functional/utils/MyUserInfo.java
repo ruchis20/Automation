@@ -5,10 +5,11 @@ import com.jcraft.jsch.UserInfo;
 
 public class MyUserInfo implements UserInfo, UIKeyboardInteractive {
 
-    private String passwd = "Qdrt45$6";
+    Configuration conf = new Configuration();
+    private String password = conf.getPassword();
 
     public String getPassword() {
-        return passwd;
+        return password;
     }
 
     public boolean promptYesNo(String str) {
@@ -33,7 +34,7 @@ public class MyUserInfo implements UserInfo, UIKeyboardInteractive {
     public String[] promptKeyboardInteractive(String destination, String name, String instruction, String[] prompt,
                                               boolean[] echo) {
         String[] response = new String[1];
-        response[0] = "Qdrt45$6";
+        response[0] = password;
         return response;
     }
 }
