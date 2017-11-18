@@ -39,8 +39,7 @@ public class BatchUtil {
             channel.connect();
             InputStream input = channel.getInputStream();
 
-            ps.println("bash");
-            ps.println("root");
+            ps.println("sesudo mcom");
             ps.println(command);
             ps.println("exit");
             ps.flush();
