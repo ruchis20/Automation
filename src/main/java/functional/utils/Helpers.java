@@ -144,29 +144,39 @@ public class Helpers {
      * @return true if found and later that than jon timestamp or false otherwise
      */
     public boolean verifyJobSuccessInLogFile(String log, String keyword, long jobStart){
-            String fileContents = batchUtil.getFileContents(log);
+        String fileContents = batchUtil.getFileContents(log);
 
-            boolean  found = false;
-            String[] lines = fileContents.split("\n");
-            int lineCount = lines.length;
-            int startLine = 0;
-            if (lineCount > 10)
-                startLine = lineCount - 10;
+        boolean  found = false;
+        String[] lines = fileContents.split("\n");
+        int lineCount = lines.length;
+        int startLine = 0;
+        if (lineCount > 10)
+            startLine = lineCount - 10;
 
-            for (int i = startLine; i < lineCount; i++){
-                String line = lines[i];
-                if(line.contains(keyword)) {
-                    String strTimestamp = line.substring(0,15);
-                    String formatted = strTimestamp.replaceAll("  ", " 0");
-                    long longTimestamp = convertDateToLong(formatted);
-
-                    System.out.println("log timestamp:" + longTimestamp);
-
-                if(jobStart <= longTimestamp)
-                    found = true;
-                }
+        String strTimestamp = "";
+        for (int i = startLine; i < lineCount; i++){
+            String line = lines[i];
+            if(line.contains(keyword)) {
+                 strTimestamp = line.substring(0,15).replaceAll("  ", " 0");
             }
-            return found;
+        }
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int year = calendar.get(Calendar.YEAR); //need current date as log does not have it
+        String monthAndDate = strTimestamp.substring(0,6); //e.g. Oct 23
+        String hourMinuteSecond = strTimestamp.substring(7,8); //e.g. 04:39:39
+        String reconStructedDate = monthAndDate + " " + String.valueOf(year) + hourMinuteSecond; //Oct 23 2017 04:39:39
+
+        long longTimestamp = convertDateToLong(reconStructedDate);
+        if(jobStart <= longTimestamp)
+            found = true;
+
+        System.out.println("*****************************************");
+        System.out.println("Job started: "+ jobStart);
+        System.out.println("Log time:" + longTimestamp);
+        System.out.println("*****************************************");
+        return found;
     }
     /**
      * static method to convert date/time string to long
@@ -175,7 +185,7 @@ public class Helpers {
      */
     private long convertDateToLong(String dateString){
         long milliseconds = 0;
-        SimpleDateFormat f = new SimpleDateFormat("MMM dd HH:mm:ss YYYY");
+        SimpleDateFormat f = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
         try {
             Date d = f.parse(dateString);
             milliseconds = d.getTime();
