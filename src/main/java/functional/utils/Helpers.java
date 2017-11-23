@@ -164,7 +164,7 @@ public class Helpers {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR); //need current date as log does not have it
-        String monthAndDate = strTimestamp.substring(0,5); //e.g. Oct 23
+        String monthAndDate = strTimestamp.substring(0,6); //e.g. Oct 23
         String hourMinuteSecond = strTimestamp.substring(7,15); //e.g. 04:39:39
         String reconStructedDate = monthAndDate+ " "+ String.valueOf(year)+" "+hourMinuteSecond; //Oct 23 2017 04:39:39
 
@@ -176,6 +176,7 @@ public class Helpers {
         System.out.println("Job started: "+ jobStart);
         System.out.println("Log time:" + longTimestamp);
         System.out.println("Reconstructed date: "+ reconStructedDate);
+        System.out.println("Comparision result: "+ found);
         System.out.println("*****************************************");
         return found;
     }
