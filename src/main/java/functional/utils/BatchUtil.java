@@ -14,12 +14,15 @@ public class BatchUtil {
     private String server = properties.get("unix_server");
     private int port = Integer.parseInt(properties.get("ssh_port"));
 
+    private long jobStart = 0;
+
     public long getJobStart() {
-        return new Date().getTime();
+        return this.jobStart;
     }
 
     public String runCommand(String command) {
         String response = "";
+        this.jobStart = new Date().getTime();
         try{
 
             JSch jsch = new JSch();

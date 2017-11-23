@@ -143,20 +143,30 @@ public class Helpers {
      * @param keyword or phrase to be searched for
      * @return true if found and later that than jon timestamp or false otherwise
      */
-    public boolean verifyJobSuccessInLogFile(String log, String keyword){
-        String fileContents = batchUtil.getFileContents(log);
-        boolean  found = false;
-        String[] lines = fileContents.split("\n");
-        for (String line: lines){
-            int position = line.length() - 20;
-            if(line.contains(keyword)) {
-                String strTimestamp = line.substring(position);
-                long longTimestamp = convertDateToLong(strTimestamp);
-                if(batchUtil.getJobStart() <= longTimestamp)
+    public boolean verifyJobSuccessInLogFile(String log, String keyword, long jobStart){
+            String fileContents = batchUtil.getFileContents(log);
+
+            boolean  found = false;
+            String[] lines = fileContents.split("\n");
+            int lineCount = lines.length;
+            int startLine = 0;
+            if (lineCount > 10)
+                startLine = lineCount - 10;
+
+            for (int i = startLine; i < lineCount; i++){
+                String line = lines[i];
+                if(line.contains(keyword)) {
+                    String strTimestamp = line.substring(0,15);
+                    String formatted = strTimestamp.replaceAll("  ", " 0");
+                    long longTimestamp = convertDateToLong(formatted);
+
+                    System.out.println("log timestamp:" + longTimestamp);
+
+                if(jobStart <= longTimestamp)
                     found = true;
+                }
             }
-        }
-        return found;
+            return found;
     }
     /**
      * static method to convert date/time string to long
