@@ -16,15 +16,18 @@ public class BatchUtil {
     private String server = properties.get("unix_server");
     private int port = Integer.parseInt(properties.get("ssh_port"));
 
-    static long jobStart;
+    private long jobStart;
+
+    public long getJobStart() {
+        return this.jobStart;
+    }
 
     public String runCommand(String command) {
-        final DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
-        jobStart = new Date().getTime();
-        System.out.println("*****************************************");
-        System.out.println("Starting job: "+ command);
-        System.out.println("Timestamp: "+ dateFormat.format(jobStart));
         String response = "";
+        final DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
+        this.jobStart = new Date().getTime();
+        System.out.println("Starting job: "+ command);
+        System.out.println("Timestamp: "+ dateFormat.format(this.jobStart));
         try{
 
             JSch jsch = new JSch();
@@ -127,26 +130,5 @@ public class BatchUtil {
         String write = "echo " + contents + " > " + fullPath;
         runCommand(write);
         return checkFileExists(file, destination);
-    }
-
-    public static class MyLogger implements com.jcraft.jsch.Logger {
-        static java.util.Hashtable name = new java.util.Hashtable();
-
-        static {
-            name.put(new Integer(DEBUG), "DEBUG: ");
-            name.put(new Integer(INFO), "INFO: ");
-            name.put(new Integer(WARN), "WARN: ");
-            name.put(new Integer(ERROR), "ERROR: ");
-            name.put(new Integer(FATAL), "FATAL: ");
-        }
-
-        public boolean isEnabled(int level) {
-            return true;
-        }
-
-        public void log(int level, String message) {
-            System.err.print(name.get(new Integer(level)));
-            System.err.println(message);
-        }
     }
 }
