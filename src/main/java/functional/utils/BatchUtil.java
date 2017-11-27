@@ -4,6 +4,8 @@ import com.jcraft.jsch.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -14,15 +16,15 @@ public class BatchUtil {
     private String server = properties.get("unix_server");
     private int port = Integer.parseInt(properties.get("ssh_port"));
 
-    private long jobStart = 0;
-
-    public long getJobStart() {
-        return this.jobStart;
-    }
+    static long jobStart;
 
     public String runCommand(String command) {
+        final DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
+        jobStart = new Date().getTime();
+        System.out.println("*****************************************");
+        System.out.println("Starting job: "+ command);
+        System.out.println("Timestamp: "+ dateFormat.format(jobStart));
         String response = "";
-        this.jobStart = new Date().getTime();
         try{
 
             JSch jsch = new JSch();

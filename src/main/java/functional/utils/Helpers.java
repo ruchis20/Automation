@@ -143,7 +143,7 @@ public class Helpers {
      * @param keyword or phrase to be searched for
      * @return true if found and later that than jon timestamp or false otherwise
      */
-    public boolean verifyJobSuccessInLogFile(String log, String keyword, long jobStart){
+    public boolean verifyJobSuccessInLogFile(String log, String keyword){
         String fileContents = batchUtil.getFileContents(log);
 
         boolean  found = false;
@@ -169,11 +169,11 @@ public class Helpers {
         String reconStructedDate = monthAndDate+ " "+ String.valueOf(year)+" "+hourMinuteSecond; //Oct 23 2017 04:39:39
 
         long longTimestamp = convertDateToLong(reconStructedDate);
-        if(jobStart <= longTimestamp)
+        if(BatchUtil.jobStart <= longTimestamp)
             found = true;
 
         System.out.println("*****************************************");
-        System.out.println("Job started: "+ jobStart);
+        System.out.println("Job started: "+ BatchUtil.jobStart);
         System.out.println("Log time:" + longTimestamp);
         System.out.println("Reconstructed date: "+ reconStructedDate);
         System.out.println("Comparision result: "+ found);
