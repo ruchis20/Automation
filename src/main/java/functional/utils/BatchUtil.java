@@ -18,12 +18,16 @@ public class BatchUtil {
 
     private long jobStart;
 
-    public void getJobStart(String response) {
+    public long getJobStart() {
+          return this.jobStart;
+    }
+
+    public void setJobStart(String response) {
         SimpleDateFormat f = new SimpleDateFormat("MMM dd HH:mm:ss");
         String[] lines = response.split("\n");
         for (String line: lines){
             if(line.contains("CST")) {
-                String strTimestamp = line.substring(3,18);
+                String strTimestamp = line.substring(4,19);
                 try {
                     Date d = f.parse(strTimestamp);
                     this.jobStart = d.getTime();
@@ -66,7 +70,7 @@ public class BatchUtil {
 
             channel.disconnect();
             session.disconnect();
-            getJobStart(response);
+            setJobStart(response);
 
         }catch(Exception e){
             e.printStackTrace();
