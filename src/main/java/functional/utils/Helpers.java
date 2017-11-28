@@ -160,22 +160,14 @@ public class Helpers {
                  strTimestamp = line.substring(0,15).replaceAll("  ", " 0");
             }
         }
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int year = calendar.get(Calendar.YEAR); //need current date as log does not have it
-        String monthAndDate = strTimestamp.substring(0,6); //e.g. Oct 23
-        String hourMinuteSecond = strTimestamp.substring(7,15); //e.g. 04:39:39
-        String reconStructedDate = monthAndDate+ " "+ String.valueOf(year)+" "+hourMinuteSecond; //Oct 23 2017 04:39:39
 
-        long longTimestamp = convertDateToLong(reconStructedDate);
+        long longTimestamp = convertDateToLong(strTimestamp);
         if(jobStart <= longTimestamp)
             found = true;
 
         System.out.println("*****************************************");
         System.out.println("Job started: "+ jobStart);
-        System.out.println("Log time:" + longTimestamp);
-        System.out.println("Reconstructed date: "+ reconStructedDate);
+        System.out.println("Log time   : "+ longTimestamp);
         System.out.println("Comparision result: "+ found);
         System.out.println("*****************************************");
         return found;
@@ -187,7 +179,7 @@ public class Helpers {
      */
     private long convertDateToLong(String dateString){
         long milliseconds = 0;
-        SimpleDateFormat f = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
+        SimpleDateFormat f = new SimpleDateFormat("MMM dd HH:mm:ss");
         try {
             Date d = f.parse(dateString);
             milliseconds = d.getTime();

@@ -4,7 +4,7 @@ import com.jcraft.jsch.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -18,16 +18,24 @@ public class BatchUtil {
 
     private long jobStart;
 
-    public long getJobStart() {
-        return this.jobStart;
+    public void getJobStart(String response) {
+        SimpleDateFormat f = new SimpleDateFormat("MMM dd HH:mm:ss");
+        String[] lines = response.split("\n");
+        for (String line: lines){
+            if(line.contains("CST")) {
+                String strTimestamp = line.substring(3,18);
+                try {
+                    Date d = f.parse(strTimestamp);
+                    this.jobStart = d.getTime();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public String runCommand(String command) {
         String response = "";
-        final DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
-        this.jobStart = new Date().getTime();
-        System.out.println("Starting job: "+ command);
-        System.out.println("Timestamp: "+ dateFormat.format(this.jobStart));
         try{
 
             JSch jsch = new JSch();
@@ -48,6 +56,7 @@ public class BatchUtil {
             InputStream input = channel.getInputStream();
 
             ps.println("sesudo mcom");
+            ps.println("date");
             ps.println(command);
             ps.println("exit");
             ps.flush();
@@ -57,6 +66,7 @@ public class BatchUtil {
 
             channel.disconnect();
             session.disconnect();
+            getJobStart(response);
 
         }catch(Exception e){
             e.printStackTrace();
